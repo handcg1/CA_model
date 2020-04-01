@@ -9,19 +9,18 @@
 #define SIZE 10
 #define GENERATION 10
 
+bool done = false;
 
 int cells[SIZE][SIZE];
-bool done = false;
+
 
 /* 
 * Queue Implementation 
 */
 
 struct node {
-
     int value;
     struct node *next;
-   // int time; -> for keeping track of the times?
 };
 typedef struct node node;
 
@@ -38,11 +37,11 @@ typedef struct queue queue;
 /*
  * initialize queue.
  */
-void initialize_queue(queue *new_queue)
+struct queue* initialize_queue()
 {
-    new_queue->node_count = 0;
-    new_queue->front = NULL;
-    new_queue->rear = NULL;
+    struct queue* queue = (struct queue*)malloc(sizeof(struct queue));
+    queue -> front = queue -> rear = NULL;
+    return queue;
 }
 
 /*
@@ -53,44 +52,70 @@ bool empty_queue(queue *queue)
     return queue->rear == NULL && queue->front == NULL;
 }
 
+struct node* new_node(int num)
+{
+    struct node* tmp = (struct node*)malloc(sizeof(struct node)); 
+    tmp->value = num; 
+    tmp->next = NULL; 
+    return tmp; 
+}
+
 /*
  * add an element to queue.
  */
 void enqueue(queue *queue, int num)
 {
-    node *new_node = malloc(sizeof(node));
-    new_node->value = num;
-    new_node->next = NULL;
-    if (empty_queue(queue)) {
-        queue->front = queue->rear = new_node;
-    } else {
-        queue->rear->next = new_node;
-        queue->rear = new_node;
-    }
+
+    struct node *tmp = new_node(num);
+
+
+  if (queue->rear == NULL) { 
+        queue->front = queue->rear = tmp; 
+        return; 
+    } 
+ 
+    queue->rear->next = tmp; 
+    queue->rear = tmp;
+
     queue->node_count++;
 }
 
 /*
  * remove an element from queue.
  */
-int dequeue(queue *queue)
+void dequeue(queue *queue)
 {
     if (empty_queue(queue)) {
         printf("ERROR: Attempting to delete an element from an empty queue.\n");
-        return(EXIT_FAILURE);
     }
-    node *node_to_delete;
-    node_to_delete = queue->front;
-    int node_value = node_to_delete->value;
-    queue->front = queue->front->next;
+
+    struct node* tmp = queue->front;
+
+    queue->front = queue->front->next; 
+
     queue->node_count--;
-    free(node_to_delete);
+
+    free(tmp);
+
     if (queue->front == NULL) {
         queue->rear = NULL;
     }
-    return node_value;
 }
 
+void print_queue(queue *queue)
+{
+    printf("Queue: ");
+
+    struct node *current_node = queue->front;
+
+    while(current_node != NULL)
+    {
+
+        printf("%d ", current_node->value);
+        current_node = current_node-> next; 
+    }
+    
+}
 
 // INITIALIZE EACH CELL TO 0 OR 1
 void initialize() {
@@ -143,6 +168,26 @@ void print() {
 
 int main(int argc, char* argv[])
 {
+
+    struct queue *test = initialize_queue();
+    enqueue(test, 4);
+    enqueue(test,9);
+    enqueue(test,10);
+    enqueue(test,-2);
+    dequeue(test);
+
+    print_queue(test);
+    // test = malloc(sizeof(queue));
+   // initialize_queue(test);
+
+   //enqueue(test,3);
+   //enque(test,6);
+
+ //  printf("test %d\n", test[1]);
+
+    
+
+    
     //TODO: READ IN SIZE FROM COMMAND LINE
    // cells = new int[SIZE][SIZE];
     initialize();
